@@ -64,3 +64,7 @@ export const DEFAULT_LANG = 'es';
 
 /** TODO(yo): correo real para el botón [ contact ] del header. */
 export const CONTACT_EMAIL = 'tu-correo@example.com';
+
+/** Recursos críticos que deben estar listos antes de la primera animación de entrada. */
+export const PRELOAD_ASSETS = ['/assets/hero/hero-1.webp'];
+export const PRELOAD_FONTS = ['900 1em "Archivo Variable"', '1em "Inter Tight Variable"', '1em "JetBrains Mono Variable"'];

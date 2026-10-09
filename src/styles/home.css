@@ -1,1 +1,154 @@
-/* home.css: se llena en su fase */
+/* ---------- Hero ---------- */
+
+/* El alto extra de scroll (--hero-runway) lo fija la fase 3 con HOME_SCROLL; sin runway no hay scroll. */
+.hero-wrap {
+  position: relative;
+  height: 100vh;
+  height: calc(100svh + var(--hero-runway, 0px));
+}
+
+.hero-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* Capa con la(s) foto(s). Su clip-path la convierte en la cápsula (ver components/hero.js). */
+.window-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.window-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.window-photo:nth-child(n + 2) {
+  opacity: 0; /* la fase 3 las cruza según el progreso del scroll */
+}
+
+.hero-content {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--gutter);
+  padding: var(--header-h) var(--gutter) 0;
+  pointer-events: none;
+}
+
+.hero-title {
+  justify-self: start;
+  font-weight: 900;
+  font-size: var(--fs-hero);
+  white-space: nowrap;
+  /* con --ls-display (-0.08em) el espacio entre palabras casi desaparece */
+  word-spacing: 0.16em;
+}
+
+/* Cada línea enmascara su texto (overflow:hidden). El padding evita cortar ascendentes/descendentes con line-height < 1. */
+.line-wrap {
+  display: block;
+  width: fit-content;
+}
+.line {
+  display: block;
+  overflow: hidden;
+  padding: 0.22em 0.06em 0.26em;
+  margin: -0.22em -0.06em -0.26em;
+}
+.line-inner {
+  display: block;
+  will-change: transform;
+}
+
+/* Garabato sobre la palabra de la línea 1; sobresale del texto, por eso vive fuera de .line */
+.line-wrap--scribble {
+  position: relative;
+}
+.scribble {
+  position: absolute;
+  left: -8%;
+  top: -34%;
+  width: 118%;
+  height: 170%;
+  overflow: visible;
+  pointer-events: none;
+}
+.scribble path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: clamp(5px, 0.6vw, 11px);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Rectángulo de medida de la cápsula: invisible, solo ocupa su sitio en el grid. */
+.capsule-ghost {
+  visibility: hidden;
+  width: clamp(120px, 12.5vw, 220px);
+  height: max(35vh, 220px);
+  height: max(35svh, 220px);
+  border-radius: 999px;
+}
+
+.hero-about {
+  justify-self: center;
+  max-width: 38ch;
+  margin: 0;
+  text-align: center;
+  font-size: var(--fs-lede);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.scroll-hint {
+  position: absolute;
+  inset: auto 0 clamp(16px, 3vh, 32px);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+.scroll-hint__icon {
+  display: inline-flex;
+}
+
+/* Tablet y móvil: una columna centrada (titular, cápsula, párrafo) */
+@media (max-width: 1023px) {
+  .hero-content {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    align-content: center;
+    row-gap: clamp(14px, 3vh, 32px);
+  }
+  .hero-title {
+    justify-self: center;
+    text-align: center;
+  }
+  .line-wrap {
+    margin-inline: auto;
+  }
+  .capsule-ghost {
+    width: clamp(120px, 18vw, 220px);
+    height: max(30vh, 200px);
+    height: max(30svh, 200px);
+  }
+}
+@media (max-width: 639px) {
+  .capsule-ghost {
+    width: 34vw;
+  }
+}

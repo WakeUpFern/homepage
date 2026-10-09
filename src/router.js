@@ -28,7 +28,7 @@ const ROUTES = [
 
 /** @typedef {{ route: typeof ROUTES[number], params: Record<string, string>, path: string }} Match */
 
-/** @type {{ root: HTMLElement, app: HTMLElement, announcer: HTMLElement } | null} */
+/** @type {{ root: HTMLElement, app: HTMLElement, announcer: HTMLElement, ready: Promise<unknown> } | null} */
 let dom = null;
 /** @type {Match | null} */
 let current = null;
@@ -97,11 +97,15 @@ async function swap(next, mode) {
     // Con lock activo hace falta `force` para mover el scroll.
     if (mode !== 'lang') scrollTo(0, { immediate: true, force: true });
 
-    next.route.view.mount({ root: dom.root }, next.params);
+    next.route.view.mount({ root: dom.root, mode }, next.params);
     current = next;
     document.title = documentTitle(next);
     if (mode !== 'lang') announce(next);
     listeners.forEach((cb) => cb(current));
+
+    // Primera carga: la vista queda montada (y oculta por su estado inicial) hasta que el preloader,
+    // las fuentes y las imágenes críticas estén listos.
+    if (mode === 'first') await dom.ready;
 
     await play(next.route.view.enter(mode === 'lang' ? LANG_SWAP : prev?.route.name ?? null));
     // El foco va al h1 al terminar enter(): mientras la vista está en visibility:hidden el navegador no lo conserva.
@@ -181,9 +185,9 @@ export function onRouteChange(cb) {
 
 export const getRoute = () => current;
 
-/** @param {{ root: HTMLElement, app: HTMLElement, announcer: HTMLElement }} elements */
+/** @param {{ root: HTMLElement, app: HTMLElement, announcer: HTMLElement, ready?: Promise<unknown> }} elements */
 export function initRouter(elements) {
-  dom = elements;
+  dom = { ready: Promise.resolve(), ...elements };
   let m = match(location.pathname);
   if (!m) {
     history.replaceState({}, '', '/');

@@ -27,11 +27,11 @@ scripts/       make-placeholders.mjs (optimize-images.mjs llega en la fase 9)
 public/assets/ hero/ trail/ projects/<slug>/ about/
 src/main.js    bootstrap (Lenis, ticker, router, cursor, header)
 src/config.js  constantes de animación (HOME_SCROLL, RING_CONFIG, TRAIL_CONFIG, PULL_CONFIG, LENIS_CONFIG)
-src/router.js · scroll.js · cursor.js
+src/router.js · scroll.js · i18n.js · motion.js
 src/data/      projects.json · timeline.json   (textos como { es, en }; `title` y `org` no se traducen)
 src/i18n/      es.json · en.json               (textos de interfaz)
 src/views/     home.js · project.js · about.js
-src/components/ header.js · trail.js · ring.js · timeline.js
+src/components/ header.js · cursor.js · preloader.js · hero.js · trail.js · ring.js · timeline.js
 src/styles/    tokens.css · base.css · header.css · home.css · project.css · about.css
 ```
 
@@ -53,6 +53,17 @@ src/styles/    tokens.css · base.css · header.css · home.css · project.css �
 - Cambio de idioma: `i18n.js` emite `change`; el router remonta la vista con fade corto, conservando scroll y foco; el header se re-renderiza en sitio.
 - Header: `mix-blend-mode: difference` con texto blanco (por eso ya no existe `--header-ink`). Hover con `SplitText` por letras. El cursor custom usa dos elementos (punto y etiqueta) para que cada uno haga `difference` por separado.
 - `window.__app = { lenis }` solo existe en DEV (para pruebas con Playwright).
+
+## Hero y entrada (fase 2)
+
+- **Modo de montaje.** El router pasa `mode` (`first | nav | lang`) a `mount()` y `makeView` lo entrega a `setup(el, params, rc)`. `setup` puede devolver `{ enter, leave, destroy }` para sobrescribir las animaciones por defecto y limpiar listeners (`destroy` corre antes de `ctx.revert()`).
+- **Compuerta de arranque.** `initRouter({ ready })`: en la primera carga la vista se monta (oculta por su estado inicial) y el router espera `ready` antes de llamar a `enter()`. `ready` = preloader (si toca) + fuentes (`PRELOAD_FONTS`) + imágenes críticas (`PRELOAD_ASSETS`), ambos en `config.js`.
+- **Preloader** (`components/preloader.js`): solo la primera visita de la sesión (`sessionStorage`, con `try/catch`) y sin reduced-motion. Mientras está activo `#app` es `inert` y el botón `skip` recibe el foco. Libera el hero `exit.heroLead` segundos después de empezar a subir la cortina.
+- **Hero** (`components/hero.js`, `HERO_CONFIG`): la ventana es un `clip-path` sobre `.window-layer` ajustado al rect de `.capsule-ghost` (div invisible solo para medir). El estado inicial oculto se fija al montar; la entrada abre la cápsula **desde su propio centro** (inset en px, mismo formato que el destino para que GSAP no mezcle `%` con `px`). El header solo se oculta/baja en `mode === 'first'`. En `lang` y con reduced-motion no hay secuencia: estado final + fade.
+- **Layout.** ≥1024px grid de 3 columnas (titular · cápsula · párrafo, como la referencia); <1024px una columna centrada. `--fs-hero` bajó a `clamp(3rem, 5.1vw, 6.2rem)` porque "soy wakeupfern" (~7.4em) no cabe en su columna con el 6.2vw del brief.
+- `.hero-wrap` solo mide 100svh por ahora (`--hero-runway` = 0): sin scroll hasta la fase 3, que lo fija con `HOME_SCROLL`.
+- Al terminar la entrada: `data-intro="done"` en la vista y evento `hero:intro-complete` en `document` (la fase 4 activa el trail ahí).
+- `window.__app = { lenis, navigate }` en DEV.
 
 ## Decisiones de arquitectura (complementan el brief)
 

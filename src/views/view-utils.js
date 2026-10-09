@@ -40,40 +40,52 @@ export function fadeEnter(el, from) {
  * @param {string} opts.name
  * @param {(params: Record<string, string>) => string} opts.render  HTML de la vista (debe incluir un único h1)
  * @param {(params: Record<string, string>) => string} [opts.title] título del documento (sin sufijo)
- * @param {(el: HTMLElement, params: Record<string, string>) => void} [opts.setup]  animaciones/listeners dentro del contexto
+ * @param {(el: HTMLElement, params: Record<string, string>, rc: { root: HTMLElement, mode: 'first' | 'nav' | 'lang' }) => ViewHooks | void} [opts.setup]
+ *   animaciones/listeners dentro del contexto. Puede devolver hooks para sobrescribir enter/leave y limpiar listeners.
+ *
+ * @typedef {object} ViewHooks
+ * @property {(from: string | null) => gsap.core.Animation} [enter]
+ * @property {(to: string) => gsap.core.Animation} [leave]
+ * @property {() => void} [destroy]  se llama en unmount() antes de ctx.revert()
  */
 export function makeView({ name, render, title, setup }) {
   /** @type {gsap.Context | null} */
   let ctx = null;
   /** @type {HTMLElement | null} */
   let el = null;
+  /** @type {ViewHooks | null} */
+  let hooks = null;
 
   return {
     name,
     getTitle: (params) => title?.(params) ?? '',
 
-    /** @param {{ root: HTMLElement }} rc @param {Record<string, string>} params */
+    /** @param {{ root: HTMLElement, mode: 'first' | 'nav' | 'lang' }} rc @param {Record<string, string>} params */
     mount(rc, params) {
       el = document.createElement('section');
       el.className = `view view-${name}`;
       el.innerHTML = render(params);
       rc.root.append(el);
-      ctx = gsap.context(() => setup?.(el, params), el);
+      ctx = gsap.context(() => {
+        hooks = setup?.(el, params, rc) ?? null;
+      }, el);
       return el;
     },
 
     unmount() {
+      hooks?.destroy?.();
       ctx?.revert();
       el?.remove();
       ctx = null;
       el = null;
+      hooks = null;
     },
 
     /** @param {string | null} from nombre de la ruta anterior (o LANG_SWAP) */
     enter(from) {
       let tl;
       ctx.add(() => {
-        tl = fadeEnter(el, from);
+        tl = hooks?.enter ? hooks.enter(from) : fadeEnter(el, from);
       });
       return tl;
     },
@@ -82,7 +94,7 @@ export function makeView({ name, render, title, setup }) {
     leave(to) {
       let tl;
       ctx.add(() => {
-        tl = fadeLeave(el, to);
+        tl = hooks?.leave ? hooks.leave(to) : fadeLeave(el, to);
       });
       return tl;
     }

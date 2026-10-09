@@ -171,3 +171,31 @@ html.has-custom-cursor textarea {
   margin-top: 4rem;
   background: repeating-linear-gradient(to bottom, var(--rule) 0 1px, transparent 1px 100vh);
 }
+
+/* Preloader (solo primera visita de la sesión) */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+}
+.preloader__count {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(3rem, 10vw, 9rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.preloader__skip {
+  position: absolute;
+  right: var(--gutter);
+  bottom: var(--gutter);
+  padding: 8px 0;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}

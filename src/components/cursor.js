@@ -93,8 +93,8 @@ export function initCursor() {
       setState(...resolve(e.target));
     });
 
+    // Solo se oculta al salir; reaparece con el siguiente pointermove (así nunca se ve en (0,0) antes de moverse).
     document.documentElement.addEventListener('mouseleave', () => setVisible(false));
-    document.documentElement.addEventListener('mouseenter', () => setVisible(true));
   });
 
   return ctx;

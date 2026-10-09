@@ -22,16 +22,33 @@ import { initI18n } from './i18n.js';
 import { initScroll } from './scroll.js';
 import { initCursor } from './components/cursor.js';
 import { initHeader } from './components/header.js';
-import { initRouter } from './router.js';
+import { runPreloader } from './components/preloader.js';
+import { initRouter, navigate } from './router.js';
+import { PRELOAD_ASSETS, PRELOAD_FONTS } from './config.js';
 
 initI18n();
 const lenis = initScroll();
 initCursor();
 initHeader(document.getElementById('header'));
+const app = document.getElementById('app');
+const decode = (src) => {
+  const img = new Image();
+  img.src = src;
+  return img.decode().catch(() => {});
+};
+
+// El hero no arranca hasta que el preloader (si toca), las fuentes y la foto crítica estén listos.
+const ready = Promise.all([
+  runPreloader({ app }),
+  ...PRELOAD_FONTS.map((f) => document.fonts.load(f).catch(() => {})),
+  ...PRELOAD_ASSETS.map(decode)
+]);
+
 initRouter({
   root: document.getElementById('view-root'),
-  app: document.getElementById('app'),
-  announcer: document.getElementById('announcer')
+  app,
+  announcer: document.getElementById('announcer'),
+  ready
 });
 
-if (import.meta.env.DEV) window.__app = { lenis };
+if (import.meta.env.DEV) window.__app = { lenis, navigate };

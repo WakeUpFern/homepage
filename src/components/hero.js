@@ -1,9 +1,10 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { HOME_SCROLL } from '../config.js';
+import { HOME_SCROLL, TRAIL_CONFIG } from '../config.js';
 import { t } from '../i18n.js';
 import { prefersReducedMotion } from '../motion.js';
 import { fadeEnter } from '../views/view-utils.js';
+import { trail } from './trail.js';
 
 const HERO_CONFIG = {
   photoScale: 1.35, // zoom inicial de la foto de la ventana; el scroll lo lleva a 1
@@ -113,6 +114,7 @@ export function createHero(el, { mode }) {
     cancelAnimationFrame(raf);
     window.removeEventListener('resize', onResize);
     ScrollTrigger.removeEventListener('refreshInit', setRunway);
+    trail.setArmed(false);
     scrollCtx?.revert();
   };
 
@@ -166,6 +168,17 @@ export function createHero(el, { mode }) {
 
       // Si se monta con el scroll ya avanzado (cambio de idioma), salta directo a ese progreso sin "alcanzarlo" con el scrub.
       tl.progress(tl.scrollTrigger.progress);
+
+      // El trail solo funciona mientras el hero es visible: durante el primer tramo del scroll.
+      const range = ScrollTrigger.create({
+        trigger: wrap,
+        start: 'top top',
+        end: TRAIL_CONFIG.activeRange,
+        onLeave: () => trail.setInRange(false),
+        onEnterBack: () => trail.setInRange(true)
+      });
+      // Estado inicial. OJO: `isActive` es false con el scroll exactamente en el inicio (progress 0), por eso se usa progress < 1.
+      trail.setInRange(range.progress < 1);
     }, el);
   }
 
@@ -208,6 +221,7 @@ export function createHero(el, { mode }) {
     layer.dataset.ready = '1';
     gsap.to(hintIcon, { y: HERO_CONFIG.hint.y, duration: HERO_CONFIG.hint.duration, ease: HERO_CONFIG.hint.ease, yoyo: true, repeat: -1 });
     buildScroll();
+    trail.setArmed(true);
     el.dataset.intro = 'done';
     return { enter: (from) => fadeEnter(el, from), destroy };
   }
@@ -230,7 +244,7 @@ export function createHero(el, { mode }) {
         el.dataset.intro = 'done';
         // El scroll se activa al terminar la entrada: así no pisa la cápsula colapsada de la secuencia.
         buildScroll();
-        // La fase 4 activa aquí el trail del mouse.
+        trail.setArmed(true);
         document.dispatchEvent(new CustomEvent('hero:intro-complete'));
       }
     });

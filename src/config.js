@@ -27,7 +27,7 @@ export const RING_CONFIG = {
 export const TRAIL_CONFIG = {
   size: 220,            // ancho px en desktop
   sizeMobile: 0,        // 0 = desactivado en táctil
-  minDist: 90,          // distancia mínima entre apariciones (px); escalar: clamp(70, innerWidth*0.08, 120)
+  minDist: { min: 70, vw: 0.08, max: 120 }, // distancia mínima entre apariciones (px) = clamp(min, innerWidth * vw, max)
   popDuration: 0.45,
   popEase: 'back.out(1.7)',
   hold: 0.5,
@@ -37,8 +37,11 @@ export const TRAIL_CONFIG = {
   startScale: 0.6,
   endScale: 0.85,
   drift: -24,           // px hacia arriba al desaparecer
-  maxActive: 8,
-  pool: 12
+  maxActive: 8,         // si hay más, la más antigua se desvanece de golpe
+  pool: 12,
+  activeRange: '+=40%', // el trail solo funciona durante este tramo de scroll del hero
+  quickFade: 0.2,       // s: al desactivar, o al superar maxActive
+  images: Array.from({ length: 12 }, (_, i) => `/assets/trail/trail-${String(i + 1).padStart(2, '0')}.webp`)
 };
 
 /** Pull-to-continue (vista de proyecto -> anillo). */

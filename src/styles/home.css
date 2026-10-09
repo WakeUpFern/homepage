@@ -210,3 +210,23 @@
   border-radius: var(--radius-btn);
   cursor: pointer;
 }
+
+/* ---------- Trail del mouse ---------- */
+/* Fuera de #app (pool persistente). Encima de la vista y debajo del header (z-index 100). */
+.trail {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: hidden;
+  pointer-events: none;
+}
+.trail img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: auto;
+  opacity: 0;
+  visibility: hidden;
+  user-select: none;
+  -webkit-user-drag: none;
+}

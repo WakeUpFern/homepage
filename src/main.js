@@ -22,6 +22,7 @@ import { initI18n } from './i18n.js';
 import { initScroll } from './scroll.js';
 import { initCursor } from './components/cursor.js';
 import { initHeader } from './components/header.js';
+import { initTrail } from './components/trail.js';
 import { runPreloader } from './components/preloader.js';
 import { initRouter, navigate } from './router.js';
 import { PRELOAD_ASSETS, PRELOAD_FONTS } from './config.js';
@@ -29,6 +30,7 @@ import { PRELOAD_ASSETS, PRELOAD_FONTS } from './config.js';
 initI18n();
 const lenis = initScroll();
 initCursor();
+initTrail(document.getElementById('trail'));
 initHeader(document.getElementById('header'));
 const app = document.getElementById('app');
 const decode = (src) => {

@@ -40,7 +40,7 @@ src/styles/    tokens.css · base.css · header.css · home.css · project.css �
 - **Toda animación se crea dentro de un `gsap.context()` y se limpia con `ctx.revert()` al desmontar la vista.** Además `unmount()` mata los ScrollTriggers de la vista y quita sus listeners.
 - Todo valor de animación (duración, easing, radio, umbral) vive en un objeto de configuración al inicio del módulo o en `src/config.js`. Sin números mágicos.
 - Animar solo `transform`, `opacity`, `clip-path`. `will-change` solo mientras anima.
-- Commits en conventional commits (`feat:`, `fix:`, `chore:`), al menos uno por fase. **Un tag de git por fase** (`phase-0`, `phase-1`, ...) sobre el commit que cierra la fase.
+- **Los commits y tags los hace el usuario, no Claude** (desde la fase 4). Al cerrar cada fase, Claude deja los cambios sin commitear y sugiere un mensaje en conventional commits (`feat:`, `fix:`, `chore:`) y el comando de tag. Un tag por fase (`phase-0`, `phase-1`, ...) sobre el commit que la cierra.
 - Una fase a la vez: dev server, verificación en navegador, consola limpia, commit, tag, y esperar el OK antes de la siguiente.
 - Dirección visual: limpia, blanco/negro, un solo acento `--accent`. Labels en mono 11px uppercase; corchetes `[ ]` solo en botones. Prácticamente sin ASCII decorativo.
 - URLs sin prefijo de idioma. Rutas: `/`, `/projects/:slug`, `/about`.
@@ -75,6 +75,14 @@ src/styles/    tokens.css · base.css · header.css · home.css · project.css �
 - **Statement:** `h2` con `display: flex` (en grid cada palabra sería una fila), palabras en máscaras manuales `.word-mask > .word`, blanco con `difference`.
 - **Reduced-motion:** sin runway ni ScrollTrigger; botón `[ ver proyectos ]` / `[ volver ]` (`.hero-actions`, `aria-expanded`) abre y cierra la ventana con fade de `HERO_CONFIG.reduced.duration`.
 - `[hidden]` se fuerza con `display: none !important` en `base.css` (los `display` de autor lo anulaban).
+
+## Trail del mouse (fase 4)
+
+- `components/trail.js` + `TRAIL_CONFIG` (`config.js`). **Pool global y persistente** de 12 `<img>` en `#trail` (fuera de `#app`, `position: fixed`, `z-index: 50`: sobre la vista y bajo el header), creado una sola vez en `initTrail()`. No se crean ni destruyen nodos en runtime. Está fuera de `#app` para que no lo afecte ninguna transformación de la vista (un ancestro con `transform` rompería `position: fixed`).
+- **Dos condiciones independientes**: `trail.setArmed()` (la vista lo arma al terminar la entrada del hero y lo desarma en `destroy`) y `trail.setInRange()` (ScrollTrigger del hero, `TRAIL_CONFIG.activeRange`, `onLeave`/`onEnterBack`). Además: puntero fino, sin reduced-motion y solo `pointerType === 'mouse'`. `sync()` reconcilia todo con un único listener `pointermove` en `window`.
+- El estado inicial del rango se calcula con `range.progress < 1`: `ScrollTrigger.isActive` es `false` con el scroll exactamente en el inicio.
+- Spawn: distancia mínima `clamp(min, innerWidth * vw, max)`; cada imagen hace pop → hold → fade con una timeline; si hay `maxActive` activas, la más antigua se desvanece de golpe (`quickFade`). `will-change` solo mientras anima. Las imágenes se decodifican (`img.decode()`) antes de la primera activación.
+- Home tiene ahora **2 ScrollTriggers** (el maestro y el del rango del trail); al salir quedan 0.
 
 ## Decisiones de arquitectura (complementan el brief)
 

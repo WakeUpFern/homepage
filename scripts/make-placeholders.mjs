@@ -1,6 +1,6 @@
 // Genera imágenes placeholder con sharp. Los slugs y ratios salen de src/data/projects.json,
 // así que para reemplazar por fotos reales basta con sobrescribir los archivos con el mismo nombre.
-// Uso: npm run placeholders
+// Uso: pnpm placeholders
 import sharp from 'sharp';
 import { mkdir, readFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';

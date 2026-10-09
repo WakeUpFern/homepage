@@ -4,14 +4,16 @@ Portafolio personal de **wakeupfern**. Especificación completa en [`BRIEF.md`](
 
 ## Comandos
 
+**Gestor de paquetes: pnpm. Nunca uses npm ni yarn.** Versión fijada en `packageManager` (`pnpm@12.10.1`); lockfile `pnpm-lock.yaml`. Donde `BRIEF.md` diga npm, léase pnpm. Dependencias: `pnpm add` / `pnpm add -D`.
+
 ```bash
-npm run dev           # Vite en http://localhost:5173
-npm run build         # build de producción en dist/
-npm run preview       # sirve dist/ en http://localhost:4173 (debe comportarse igual que dev)
-npm run placeholders  # regenera imágenes placeholder en public/assets (lee src/data/projects.json)
+pnpm dev           # Vite en http://localhost:5173
+pnpm build         # build de producción en dist/
+pnpm preview       # sirve dist/ en http://localhost:4173 (debe comportarse igual que dev)
+pnpm placeholders  # genera placeholders en public/assets (lee src/data/projects.json). Sobrescribe archivos: NO correrlo sobre fotos reales
 ```
 
-Verificación en navegador con Playwright (solo Chromium instalado). Scripts de verificación en la carpeta temporal de la sesión, no en el repo.
+Verificación en navegador con Playwright (solo Chromium: `pnpm exec playwright install chromium`). Scripts de verificación en la carpeta temporal de la sesión, no en el repo.
 
 ## Stack
 

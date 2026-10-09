@@ -45,6 +45,15 @@ src/styles/    tokens.css · base.css · header.css · home.css · project.css �
 - Dirección visual: limpia, blanco/negro, un solo acento `--accent`. Labels en mono 11px uppercase; corchetes `[ ]` solo en botones. Prácticamente sin ASCII decorativo.
 - URLs sin prefijo de idioma. Rutas: `/`, `/projects/:slug`, `/about`.
 
+## Router y vistas (fase 1)
+
+- `src/router.js`: History API propia. Rutas `/`, `/projects` (alias de home), `/projects/:slug` (slug validado contra `projects.json`) y `/about`; rutas desconocidas redirigen a `/` con `replaceState`. Intercepta clicks en `<a href>` internos (sin modificadores, sin `target`/`download`, anclas de la misma página y `mailto:` se dejan al navegador). `popstate` usa el mismo `swap()`; si llega durante una transición queda en `pending` y se ejecuta al terminar.
+- `swap(match, mode)` con `mode` `first | nav | lang`: bloquea input (`pointer-events: none` en `#app` + `lenis.stop()`), `leave` → `unmount` → scroll a 0 (`force: true`, porque Lenis está parado) → `mount` → título + `aria-live` → `enter` → foco al `h1` (después de `enter`: en `visibility: hidden` el navegador pierde el foco) → `lenis.start()` + `ScrollTrigger.refresh()`.
+- Contrato de vista: `{ name, getTitle(params), mount({ root }, params), unmount(), enter(from), leave(to) }`; `enter/leave` devuelven una animación de GSAP. `views/view-utils.js › makeView()` crea el contexto (`gsap.context`) y los fades por defecto; las vistas reales sobreescriben `enter/leave`. `from`/`to` es el nombre de la ruta o `'lang'` (`LANG_SWAP`) cuando solo cambia el idioma.
+- Cambio de idioma: `i18n.js` emite `change`; el router remonta la vista con fade corto, conservando scroll y foco; el header se re-renderiza en sitio.
+- Header: `mix-blend-mode: difference` con texto blanco (por eso ya no existe `--header-ink`). Hover con `SplitText` por letras. El cursor custom usa dos elementos (punto y etiqueta) para que cada uno haga `difference` por separado.
+- `window.__app = { lenis }` solo existe en DEV (para pruebas con Playwright).
+
 ## Decisiones de arquitectura (complementan el brief)
 
 1. **Idioma.** El idioma vive en `localStorage` (con `try/catch`) y en `<html lang>`. Al cambiarlo, **el anillo NO se remonta** (es una capa persistente): solo se actualizan sus textos y `aria-label`. Las demás vistas sí se remontan, con un fade corto.

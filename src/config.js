@@ -61,3 +61,6 @@ export const LENIS_CONFIG = {
 
 export const LANGS = ['es', 'en'];
 export const DEFAULT_LANG = 'es';
+
+/** TODO(yo): correo real para el botón [ contact ] del header. */
+export const CONTACT_EMAIL = 'tu-correo@example.com';

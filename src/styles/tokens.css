@@ -24,10 +24,15 @@
   --gutter: clamp(12px, 2vw, 28px);
   --gap-media: 8px;
   --header-h: 56px;
-  --header-ink: var(--ink);                /* el header lo cambia con scroll */
 
   --radius-btn: 6px;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+@media (max-width: 639px) {
+  :root {
+    --header-h: 76px; /* el header se apila en dos filas */
+  }
 }

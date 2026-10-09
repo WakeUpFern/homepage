@@ -5,9 +5,10 @@
     "viewHome": "home",
     "viewProjects": "projects",
     "viewAbout": "about me",
+    "mainNav": "main navigation",
     "viewProject": "project"
   },
-  "nav": { "home": "home", "projects": "projects", "about": "about", "contact": "contact", "lang": "language" },
+  "nav": { "home": "home", "projects": "projects", "about": "about", "contact": "contact", "langSwitch": "switch language to Spanish", "lang": "language" },
   "header": { "projectInfo": "project info", "projectsButton": "projects" },
   "preloader": { "skip": "skip" },
   "hero": {
@@ -29,5 +30,6 @@
     "current": "current",
     "goodbye": "thanks for making it this far."
   },
+  "stub": { "label": "placeholder view · phase 1" },
   "footer": { "copyright": "© 2026 wakeupfern", "contact": "contact" }
 }

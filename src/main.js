@@ -18,12 +18,20 @@ import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 
 gsap.registerPlugin(ScrollTrigger, Flip, SplitText, DrawSVGPlugin, MotionPathPlugin);
 
-// Fase 0: página de verificación del scaffold. El router y las vistas llegan en la fase 1.
-const app = document.getElementById('app');
-app.innerHTML = `
-  <main id="view-root" tabindex="-1" style="padding: var(--gutter); min-height: 100svh; display: grid; place-content: center; gap: 1.5rem;">
-    <p class="mono">[ fase 0 · scaffold ]</p>
-    <h1 style="font-size: var(--fs-hero)">wakeupfern</h1>
-    <p>Inter Tight para texto. <span class="mono">JetBrains Mono para labels</span></p>
-  </main>
-`;
+import { initI18n } from './i18n.js';
+import { initScroll } from './scroll.js';
+import { initCursor } from './components/cursor.js';
+import { initHeader } from './components/header.js';
+import { initRouter } from './router.js';
+
+initI18n();
+const lenis = initScroll();
+initCursor();
+initHeader(document.getElementById('header'));
+initRouter({
+  root: document.getElementById('view-root'),
+  app: document.getElementById('app'),
+  announcer: document.getElementById('announcer')
+});
+
+if (import.meta.env.DEV) window.__app = { lenis };

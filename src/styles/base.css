@@ -101,3 +101,73 @@ h3 {
     scroll-behavior: auto;
   }
 }
+
+/* #app agrupa header, capa del anillo y vista actual. No debe crear stacking context (el header usa mix-blend-mode). */
+#view-root {
+  position: relative;
+  outline: none;
+}
+#layer-ring {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Cursor custom (solo puntero fino): punto + etiqueta, ambos con difference sobre la página */
+:root {
+  --cursor-dot: 10px;
+}
+.cursor-dot,
+.cursor-label {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  color: #fff;
+  mix-blend-mode: difference;
+}
+.cursor-dot {
+  width: var(--cursor-dot);
+  height: var(--cursor-dot);
+  border-radius: 50%;
+  background: #fff;
+}
+.cursor-label {
+  white-space: nowrap;
+}
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
+}
+html.has-custom-cursor input,
+html.has-custom-cursor textarea {
+  cursor: text !important;
+}
+@media (pointer: coarse), (hover: none) {
+  .cursor-dot,
+  .cursor-label {
+    display: none;
+  }
+}
+
+/* Vistas de prueba de la fase 1 (se retiran al implementar cada vista real) */
+.view-stub {
+  padding: calc(var(--header-h) + 12vh) var(--gutter) 0;
+}
+.view-stub h1 {
+  font-size: var(--fs-title);
+  margin: 1rem 0 1.5rem;
+}
+.stub-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+.stub-spacer {
+  height: 220vh;
+  margin-top: 4rem;
+  background: repeating-linear-gradient(to bottom, var(--rule) 0 1px, transparent 1px 100vh);
+}

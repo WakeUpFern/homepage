@@ -5,9 +5,10 @@
     "viewHome": "inicio",
     "viewProjects": "proyectos",
     "viewAbout": "sobre mí",
+    "mainNav": "navegación principal",
     "viewProject": "proyecto"
   },
-  "nav": { "home": "home", "projects": "projects", "about": "about", "contact": "contact", "lang": "idioma" },
+  "nav": { "home": "home", "projects": "projects", "about": "about", "contact": "contact", "langSwitch": "cambiar idioma a inglés", "lang": "idioma" },
   "header": { "projectInfo": "project info", "projectsButton": "proyectos" },
   "preloader": { "skip": "saltar" },
   "hero": {
@@ -29,5 +30,6 @@
     "current": "actual",
     "goodbye": "gracias por llegar hasta aquí."
   },
+  "stub": { "label": "vista de prueba · fase 1" },
   "footer": { "copyright": "© 2026 wakeupfern", "contact": "contacto" }
 }

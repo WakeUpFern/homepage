@@ -53,7 +53,7 @@ src/styles/    tokens.css · base.css · header.css · home.css · project.css �
 - **Alias de la misma vista** (`/` ↔ `/projects`): `swap()` no remonta; solo actualiza ruta activa, título, `aria-live` y notifica a `onRouteChange` (y hace `scrollTo(0)` en `home`). La vista decide qué hacer con `/projects` (fase 5: llevar el scroll al anillo).
 - Cambio de idioma: `i18n.js` emite `change`; el router remonta la vista con fade corto, conservando scroll y foco; el header se re-renderiza en sitio.
 - Header: `mix-blend-mode: difference` con texto blanco (por eso ya no existe `--header-ink`). Hover con `SplitText` por letras. El cursor custom usa dos elementos (punto y etiqueta) para que cada uno haga `difference` por separado.
-- `window.__app = { lenis }` solo existe en DEV (para pruebas con Playwright).
+- `window.__app = { lenis, navigate, ScrollTrigger }` solo existe en DEV (para pruebas con Playwright).
 
 ## Hero y entrada (fase 2)
 
@@ -62,9 +62,19 @@ src/styles/    tokens.css · base.css · header.css · home.css · project.css �
 - **Preloader** (`components/preloader.js`): solo la primera visita de la sesión (`sessionStorage`, con `try/catch`) y sin reduced-motion. Mientras está activo `#app` es `inert` y el botón `skip` recibe el foco. Libera el hero `exit.heroLead` segundos después de empezar a subir la cortina.
 - **Hero** (`components/hero.js`, `HERO_CONFIG`): la ventana es un `clip-path` sobre `.window-layer` ajustado al rect de `.capsule-ghost` (div invisible solo para medir). El estado inicial oculto se fija al montar; la entrada abre la cápsula **desde su propio centro** (inset en px, mismo formato que el destino para que GSAP no mezcle `%` con `px`). El header solo se oculta/baja en `mode === 'first'`. En `lang` y con reduced-motion no hay secuencia: estado final + fade.
 - **Layout.** ≥1024px grid de 3 columnas (titular · cápsula · párrafo, como la referencia); <1024px una columna centrada. `--fs-hero` bajó a `clamp(3rem, 5.1vw, 6.2rem)` porque "soy wakeupfern" (~7.4em) no cabe en su columna con el 6.2vw del brief.
-- `.hero-wrap` solo mide 100svh por ahora (`--hero-runway` = 0): sin scroll hasta la fase 3, que lo fija con `HOME_SCROLL`.
 - Al terminar la entrada: `data-intro="done"` en la vista y evento `hero:intro-complete` en `document` (la fase 4 activa el trail ahí).
-- `window.__app = { lenis, navigate }` en DEV.
+
+## Ventana y scroll del home (fase 3)
+
+- **Un solo ScrollTrigger maestro** (`components/hero.js › buildScroll`) sobre `.hero-wrap`, `scrub: 0.6`, con la línea de tiempo medida en **unidades de vh** (`HOME_SCROLL`): `0 → open` abre la ventana (clip-path cápsula → `inset(0 round 0)` con `power2.inOut`), parallax de la foto (scale 1.35 → 1), cruce de fotos (foto 2 al 35 %, foto 3 al 70 %) y sale el contenido del hero; `open → open+statement` revela el statement. Reversible. La zona `ring` de `HOME_SCROLL` aún no se usa: la fase 5 la añade (y el footer).
+- **Se construye al terminar la entrada** (`onComplete` del intro), no al montar: si no, el `fromTo` de la cápsula pisaría el estado colapsado del intro. Vive en su propio `gsap.context` (`scrollCtx`), que `destroy()` revierte (0 ScrollTriggers tras salir del home).
+- **La cápsula se mide relativa a `.hero-content`**, no al stage: el contenido se desplaza durante el scroll y medir contra el stage contaminaría el inset al hacer resize a mitad del recorrido. `invalidateOnRefresh: true` + valores en función.
+- **El recorrido (`--hero-runway`) va en el HTML de la vista desde el montaje** (`calc(250 * 1svh)`; px exactos en `refreshInit`). Si el documento fuera más corto aunque sea un instante (remonte por idioma), el navegador recorta el scroll a 0. Tras construir, `tl.progress(st.progress)` evita que el scrub "alcance" el progreso.
+- **Header:** con `mix-blend-mode: difference` ya es legible sobre la ventana abierta; no hace falta el cambio de color del brief.
+- **Ocultar con máscara:** con `line-height < 1` las puntas de las letras sobresalen de la caja y asoman si se oculta con 110 %. Titular y statement usan `yPercent: 150`.
+- **Statement:** `h2` con `display: flex` (en grid cada palabra sería una fila), palabras en máscaras manuales `.word-mask > .word`, blanco con `difference`.
+- **Reduced-motion:** sin runway ni ScrollTrigger; botón `[ ver proyectos ]` / `[ volver ]` (`.hero-actions`, `aria-expanded`) abre y cierra la ventana con fade de `HERO_CONFIG.reduced.duration`.
+- `[hidden]` se fuerza con `display: none !important` en `base.css` (los `display` de autor lo anulaban).
 
 ## Decisiones de arquitectura (complementan el brief)
 

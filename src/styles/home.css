@@ -22,6 +22,10 @@
   inset: 0;
   z-index: 0;
 }
+.window-photos {
+  position: absolute;
+  inset: 0;
+}
 .window-photo {
   position: absolute;
   inset: 0;
@@ -30,7 +34,7 @@
   object-fit: cover;
 }
 .window-photo:nth-child(n + 2) {
-  opacity: 0; /* la fase 3 las cruza según el progreso del scroll */
+  opacity: 0; /* se cruzan según el progreso del scroll */
 }
 
 .hero-content {
@@ -151,4 +155,58 @@
   .capsule-ghost {
     width: 34vw;
   }
+}
+
+/* ---------- Statement (aparece cuando la ventana termina de abrirse) ---------- */
+.statement {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  /* flex (no grid): en un grid cada palabra sería una fila */
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  column-gap: 0.16em;
+  padding: var(--header-h) var(--gutter) 0;
+  margin: 0;
+  color: #fff;
+  mix-blend-mode: difference;
+  text-align: center;
+  text-wrap: balance;
+  font-weight: 900;
+  font-size: clamp(3.4rem, 11vw, 12rem);
+  line-height: 0.82;
+  pointer-events: none;
+}
+.word-mask {
+  display: inline-block;
+  vertical-align: top;
+  overflow: hidden;
+  padding: 0.14em 0.05em 0.2em;
+  margin: -0.14em -0.05em -0.2em;
+}
+.word {
+  display: inline-block;
+}
+
+/* Reduced-motion: botón para abrir/cerrar la ventana (sin scrub) */
+.hero-actions {
+  position: absolute;
+  inset: auto 0 clamp(16px, 3vh, 32px);
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  mix-blend-mode: difference; /* en el contenedor: el botón no puede mezclarse solo dentro de su propio stacking context */
+}
+.hero-actions[hidden] {
+  display: none;
+}
+.hero-open {
+  padding: 10px 14px;
+  color: #fff;
+  background: none;
+  border: 1px solid #fff;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
 }

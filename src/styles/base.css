@@ -33,6 +33,11 @@ html.lenis body {
   overflow: hidden;
 }
 
+/* Los display de autor (flex, grid...) anulan el [hidden] del navegador: se fuerza */
+[hidden] {
+  display: none !important;
+}
+
 img {
   display: block;
   max-width: 100%;

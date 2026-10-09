@@ -8,7 +8,7 @@
 export const HOME_SCROLL = {
   open: 150,      // la ventana pasa de cápsula a pantalla completa (scrub)
   statement: 100, // statement + intro del anillo (por tiempo, no por scrub)
-  ring: 150       // el anillo gira con el scroll; al final se desvanece y aparece el footer
+  ring: 150       // (aún sin usar; la fase 5 lo añade) el anillo gira con el scroll; al final se desvanece y aparece el footer
 };
 
 export const RING_CONFIG = {

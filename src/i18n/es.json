@@ -17,6 +17,7 @@
     "about": "Desarrollador enfocado en seguridad y cloud. Construyo herramientas, backends e infraestructura que funcionan y se ven bien.",
     "scroll": "scroll",
     "openProjects": "ver proyectos",
+    "closeProjects": "volver",
     "statement": "cosas que construyo"
   },
   "cursor": { "view": "View" },

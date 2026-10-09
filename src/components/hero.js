@@ -1,26 +1,42 @@
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { HOME_SCROLL } from '../config.js';
+import { t } from '../i18n.js';
 import { prefersReducedMotion } from '../motion.js';
 import { fadeEnter } from '../views/view-utils.js';
 
 const HERO_CONFIG = {
-  photoScale: 1.35, // zoom inicial de la foto de la ventana (la fase 3 lo lleva a 1 con el scroll)
+  photoScale: 1.35, // zoom inicial de la foto de la ventana; el scroll lo lleva a 1
   intro: {
     ease: 'expo.out',
-    title: { yPercent: 110, duration: 1.0, stagger: 0.08 },
+    title: { yPercent: 150, duration: 1.0, stagger: 0.08 }, // 150: con line-height < 1 las puntas de las letras asoman si se oculta con 110
     capsule: { duration: 1.1, offset: '-=0.6' },
     scribble: { duration: 0.9, ease: 'power2.inOut', offset: '-=0.4' },
     texts: { y: 16, duration: 0.8, stagger: 0.12, offset: '-=0.5' },
     header: { duration: 0.7, offset: '-=0.3' }
   },
-  hint: { y: 6, duration: 1.2, ease: 'sine.inOut' } // flotación del ícono de scroll
+  hint: { y: 6, duration: 1.2, ease: 'sine.inOut' }, // flotación del ícono de scroll
+  // Scroll: la línea de tiempo se mide en unidades de vh (HOME_SCROLL). `at`/`span` son fracciones de `open`.
+  scroll: {
+    scrub: 0.6,
+    openEase: 'power2.inOut',
+    content: { yPercent: -12, span: 0.5 },                                  // titular + párrafo se van antes de que la ventana llene la pantalla
+    crossfade: [{ at: 0.35, span: 0.15 }, { at: 0.7, span: 0.15 }],         // foto 2 y foto 3
+    photoEnterScale: 1.08,
+    statement: { yPercent: 150, span: 0.45, ease: 'power3.out', spread: 0.6 } // span: fracción de `statement`; spread: fracción de ese span repartida en stagger
+  },
+  reduced: { duration: 0.4 } // abrir/cerrar la ventana con el botón
 };
 
+const FULL_INSET = 'inset(0px 0px 0px 0px round 0px)';
+
 /**
- * Hero del home: titular, garabato, cápsula-ventana, párrafo e indicador de scroll.
+ * Hero del home: titular, garabato, cápsula-ventana, párrafo, indicador de scroll y statement.
  * Debe llamarse dentro del gsap.context() de la vista (makeView lo hace en setup).
  *
  * La "ventana" no es un elemento: es un clip-path sobre `.window-layer` ajustado al rectángulo de
- * `.capsule-ghost`, un div invisible que solo sirve para medir.
+ * `.capsule-ghost`, un div invisible que solo sirve para medir. Con el scroll el clip-path crece
+ * hasta cubrir el stage y revela la sección siguiente (fase 5: el anillo de proyectos).
  *
  * @param {HTMLElement} el sección de la vista
  * @param {{ mode: 'first' | 'nav' | 'lang' }} rc
@@ -28,25 +44,40 @@ const HERO_CONFIG = {
  */
 export function createHero(el, { mode }) {
   const $ = (sel) => el.querySelector(sel);
+  const wrap = $('.hero-wrap');
   const stage = $('.hero-stage');
   const layer = $('.window-layer');
+  const photoWrap = $('.window-photos');
   const photos = el.querySelectorAll('.window-photo');
+  const content = $('.hero-content');
   const ghost = $('.capsule-ghost');
   const lines = el.querySelectorAll('.line-inner');
   const scribble = $('.scribble path');
   const about = $('.hero-about');
   const hint = $('.scroll-hint');
   const hintIcon = $('.scroll-hint__icon');
+  const statement = $('.statement');
+  const statementWords = el.querySelectorAll('.statement .word');
+  const actions = $('.hero-actions');
+  const openBtn = $('.hero-open');
   const header = document.getElementById('header');
 
   const first = mode === 'first';
-  let introDone = false;
+  const reduced = prefersReducedMotion();
+  let scrollCtx = null; // contexto del ScrollTrigger (se crea al terminar la entrada)
+  let reducedOpen = false;
 
-  /** Rectángulo de la cápsula relativo al stage, como inset() con esquinas totalmente redondeadas. */
+  /**
+   * Rectángulo de la cápsula en coordenadas del stage. Se mide relativo a `.hero-content` (que cubre el
+   * stage) y no al stage, así el desplazamiento del contenido durante el scroll no contamina la medida.
+   */
   function rect() {
     const s = stage.getBoundingClientRect();
+    const c = content.getBoundingClientRect();
     const g = ghost.getBoundingClientRect();
-    return { top: g.top - s.top, left: g.left - s.left, right: g.right - s.left, bottom: g.bottom - s.top, w: s.width, h: s.height };
+    const left = g.left - c.left;
+    const top = g.top - c.top;
+    return { top, left, right: left + g.width, bottom: top + g.height, w: s.width, h: s.height };
   }
   const inset = (top, right, bottom, left) => `inset(${top}px ${right}px ${bottom}px ${left}px round 999px)`;
 
@@ -63,29 +94,121 @@ export function createHero(el, { mode }) {
     return inset(cy, r.w - cx, r.h - cy, cx);
   }
 
-  // Si cambia el tamaño de la ventana, la cápsula debe seguir al fantasma.
+  /** Alto del recorrido de scroll (open + statement), en px. 1 unidad de la línea de tiempo = 1vh del stage. */
+  const vh = () => stage.offsetHeight / 100;
+  const runwayUnits = HOME_SCROLL.open + HOME_SCROLL.statement;
+  const setRunway = () => wrap.style.setProperty('--hero-runway', `${vh() * runwayUnits}px`);
+
+  // Sin ScrollTrigger (reduced-motion o antes de terminar la entrada) la cápsula sigue al fantasma al redimensionar.
   let raf = 0;
   const onResize = () => {
     cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(() => introDone && gsap.set(layer, { clipPath: capsuleInset() }));
+    raf = requestAnimationFrame(() => {
+      if (!scrollCtx && !reducedOpen && layer.dataset.ready) gsap.set(layer, { clipPath: capsuleInset() });
+    });
   };
   window.addEventListener('resize', onResize);
 
   const destroy = () => {
     cancelAnimationFrame(raf);
     window.removeEventListener('resize', onResize);
+    ScrollTrigger.removeEventListener('refreshInit', setRunway);
+    scrollCtx?.revert();
   };
 
-  gsap.set(photos, { scale: HERO_CONFIG.photoScale });
+  /**
+   * Scroll: UN solo ScrollTrigger con scrub sobre `.hero-wrap` y una línea de tiempo en unidades de vh.
+   *   0 → open:                la ventana crece de cápsula a pantalla completa (clip-path), la foto hace
+   *                            parallax (scale 1.35 → 1), se cruzan las fotos y se va el contenido del hero.
+   *   open → open + statement: aparece el statement. (La fase 5 monta aquí el anillo.)
+   * Es reversible: al subir, la ventana vuelve a ser cápsula sin saltos.
+   */
+  function buildScroll() {
+    const S = HOME_SCROLL;
+    const C = HERO_CONFIG.scroll;
+    setRunway();
+    ScrollTrigger.addEventListener('refreshInit', setRunway);
 
-  // Remonte por cambio de idioma o reduced-motion: estado final, sin secuencia de entrada.
-  if (mode === 'lang' || prefersReducedMotion()) {
+    scrollCtx = gsap.context(() => {
+      const tl = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: wrap,
+          start: 'top top',
+          end: () => `+=${vh() * runwayUnits}`,
+          scrub: C.scrub,
+          invalidateOnRefresh: true // la cápsula se vuelve a medir en cada refresh/resize
+        }
+      });
+
+      tl.fromTo(layer, { clipPath: () => capsuleInset() }, { clipPath: FULL_INSET, ease: C.openEase, duration: S.open }, 0)
+        .fromTo(photoWrap, { scale: HERO_CONFIG.photoScale }, { scale: 1, duration: S.open }, 0)
+        .fromTo(content, { yPercent: 0, autoAlpha: 1 }, { yPercent: C.content.yPercent, autoAlpha: 0, duration: S.open * C.content.span }, 0);
+
+      C.crossfade.forEach(({ at, span }, i) => {
+        const photo = photos[i + 1];
+        if (!photo) return;
+        tl.fromTo(photo, { autoAlpha: 0, scale: C.photoEnterScale }, { autoAlpha: 1, scale: 1, duration: S.open * span }, S.open * at);
+      });
+
+      const st = C.statement;
+      const revealSpan = S.statement * st.span;
+      tl.fromTo(
+        statementWords,
+        { yPercent: st.yPercent },
+        { yPercent: 0, ease: st.ease, duration: revealSpan * (1 - st.spread), stagger: { amount: revealSpan * st.spread } },
+        S.open
+      );
+
+      // Fija la duración total de la línea de tiempo (= recorrido completo del ScrollTrigger).
+      const total = S.open + S.statement;
+      tl.to({}, { duration: 0.001 }, total - 0.001);
+
+      // Si se monta con el scroll ya avanzado (cambio de idioma), salta directo a ese progreso sin "alcanzarlo" con el scrub.
+      tl.progress(tl.scrollTrigger.progress);
+    }, el);
+  }
+
+  /** Reduced-motion: sin scrub. La ventana se abre/cierra con un botón y un fade. */
+  function setupReduced() {
+    const R = HERO_CONFIG.reduced;
+    actions.hidden = false;
+    hint.hidden = true;
     gsap.set(layer, { clipPath: capsuleInset() });
-    introDone = true;
+    gsap.set(statementWords, { yPercent: 0 });
+    gsap.set(statement, { autoAlpha: 0 });
+    layer.dataset.ready = '1';
+
+    const tl = gsap.timeline({ paused: true, defaults: { duration: R.duration, ease: 'none' } });
+    tl.to(layer, { clipPath: FULL_INSET }, 0)
+      .to(photoWrap, { scale: 1 }, 0)
+      .to(content, { autoAlpha: 0 }, 0)
+      .to(statement, { autoAlpha: 1 }, 0);
+
+    openBtn.addEventListener('click', () => {
+      reducedOpen = !reducedOpen;
+      tl[reducedOpen ? 'play' : 'reverse']();
+      openBtn.setAttribute('aria-expanded', String(reducedOpen));
+      openBtn.textContent = `[ ${t(reducedOpen ? 'hero.closeProjects' : 'hero.openProjects')} ]`;
+    });
+  }
+
+  gsap.set(photoWrap, { scale: HERO_CONFIG.photoScale });
+  gsap.set(statementWords, { yPercent: HERO_CONFIG.scroll.statement.yPercent });
+
+  if (reduced) {
+    setupReduced();
     el.dataset.intro = 'done';
-    if (!prefersReducedMotion()) {
-      gsap.to(hintIcon, { y: HERO_CONFIG.hint.y, duration: HERO_CONFIG.hint.duration, ease: HERO_CONFIG.hint.ease, yoyo: true, repeat: -1 });
-    }
+    return { enter: (from) => fadeEnter(el, from), destroy };
+  }
+
+  // Remonte por cambio de idioma: estado final inmediato y el scroll se reconstruye en el progreso actual.
+  if (mode === 'lang') {
+    gsap.set(layer, { clipPath: capsuleInset() });
+    layer.dataset.ready = '1';
+    gsap.to(hintIcon, { y: HERO_CONFIG.hint.y, duration: HERO_CONFIG.hint.duration, ease: HERO_CONFIG.hint.ease, yoyo: true, repeat: -1 });
+    buildScroll();
+    el.dataset.intro = 'done';
     return { enter: (from) => fadeEnter(el, from), destroy };
   }
 
@@ -103,8 +226,10 @@ export function createHero(el, { mode }) {
     const tl = gsap.timeline({
       defaults: { ease: c.ease },
       onComplete: () => {
-        introDone = true;
+        layer.dataset.ready = '1';
         el.dataset.intro = 'done';
+        // El scroll se activa al terminar la entrada: así no pisa la cápsula colapsada de la secuencia.
+        buildScroll();
         // La fase 4 activa aquí el trail del mouse.
         document.dispatchEvent(new CustomEvent('hero:intro-complete'));
       }

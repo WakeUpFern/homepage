@@ -17,6 +17,7 @@
     "about": "Developer focused on security and cloud. I build tools, backends and infrastructure that work and look good.",
     "scroll": "scroll",
     "openProjects": "view projects",
+    "closeProjects": "back",
     "statement": "things i build"
   },
   "cursor": { "view": "View" },

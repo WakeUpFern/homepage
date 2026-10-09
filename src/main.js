@@ -51,4 +51,4 @@ initRouter({
   ready
 });
 
-if (import.meta.env.DEV) window.__app = { lenis, navigate };
+if (import.meta.env.DEV) window.__app = { lenis, navigate, ScrollTrigger };

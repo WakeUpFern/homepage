@@ -87,6 +87,17 @@ function focusHeading() {
  * @param {'first' | 'nav' | 'lang'} mode  'lang' remonta la misma ruta conservando scroll y foco
  */
 async function swap(next, mode) {
+  // Alias de la misma vista (/ ↔ /projects): no se remonta. Solo cambia la ruta activa (header, título, aria-live).
+  // La vista decidirá qué hacer con el cambio (p. ej. la fase 5 llevará el scroll al anillo en /projects).
+  if (mode === 'nav' && current && current.route.view === next.route.view && JSON.stringify(current.params) === JSON.stringify(next.params)) {
+    current = next;
+    document.title = documentTitle(next);
+    announce(next);
+    listeners.forEach((cb) => cb(current));
+    if (next.route.name === 'home') scrollTo(0);
+    return;
+  }
+
   busy = true;
   lockInput();
   try {

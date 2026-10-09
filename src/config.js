@@ -7,21 +7,36 @@
 /** Distancias de scroll del home, en vh. El alto de .hero-wrap = 100vh (stage) + suma. */
 export const HOME_SCROLL = {
   open: 150,      // la ventana pasa de cápsula a pantalla completa (scrub)
-  statement: 100, // statement + intro del anillo (por tiempo, no por scrub)
-  ring: 150       // (aún sin usar; la fase 5 lo añade) el anillo gira con el scroll; al final se desvanece y aparece el footer
+  statement: 100, // statement; al terminar de abrirse la ventana arranca la intro del anillo (por tiempo, no por scrub)
+  ring: 150       // el anillo gira con el scroll; al final se desvanece y el documento termina en el footer
 };
 
 export const RING_CONFIG = {
-  radius: () => Math.min(innerWidth, innerHeight) * 0.34,
-  ellipse: 1.15,             // rx = r * ellipse, ry = r
+  seed: 7,                   // semilla del PRNG: el anillo se ve igual en cada visita
+  // Geometría por breakpoint. radius = radio vertical (ry); rx = radius * ellipse. cardH = [min px, fracción de innerHeight, max px]
+  layout: {
+    desktop: { radius: () => Math.min(innerWidth, innerHeight) * 0.34, ellipse: 1.15, cardH: [110, 0.16, 190] },
+    tablet: { radius: () => Math.min(innerWidth, innerHeight) * 0.3, ellipse: 1.1, cardH: [96, 0.13, 150] },
+    mobile: { radius: () => innerWidth * 0.5, ellipse: 0.58, cardH: [84, 0.12, 120], maxCards: 8 }
+  },
   floatAmp: [6, 12],         // px de flotación por tarjeta (aleatorio por tarjeta)
   floatSpeed: [0.15, 0.35],  // ciclos/seg por tarjeta
-  idleSpin: 0.0006,          // rad/frame de giro lento
+  idleSpin: 0.0006,          // rad/frame (a 60fps) de giro lento
   scrollSpin: 0.0004,        // rad por unidad de velocidad de Lenis
+  maxScrollVel: 90,          // tope de la velocidad de Lenis que se convierte en giro
+  velSmooth: 0.3,            // s: suavizado de esa velocidad
   jitter: 0.18,              // variación de ángulo por tarjeta (rad)
   radialJitter: 0.12,        // variación del radio por tarjeta (±12%)
   depth: [0.85, 1.1],        // escala por tarjeta según su "profundidad"
-  intro: { fly: 1.4, hold: 0.8, gather: 0.9, expand: 1.3 }
+  intro: {
+    fly: 1.4, hold: 0.8, gather: 0.9, expand: 1.3,
+    cardFade: 0.4, cardStagger: 0.05,            // aparición de las tarjetas mientras vuelan
+    gatherRadius: 0.12, gatherSpread: 0.7,       // "se juntan": radio y escala relativos
+    expandEase: 'back.out(1.2)'                  // ligero overshoot en el radio
+  },
+  introShort: { gather: 0.35, expand: 0.55 },    // versión corta (0.9 s) al volver de un proyecto
+  hover: { scale: 1.12, scaleDuration: 0.35, ease: 'power3.out', dim: 0.35, fadeDuration: 0.3, spin: 0.15 }, // spin: fracción del giro mientras hay hover
+  layerFade: 0.25            // s: mostrar/ocultar la capa
 };
 
 export const TRAIL_CONFIG = {

@@ -40,7 +40,7 @@ export function fadeEnter(el, from) {
  * @param {string} opts.name
  * @param {(params: Record<string, string>) => string} opts.render  HTML de la vista (debe incluir un único h1)
  * @param {(params: Record<string, string>) => string} [opts.title] título del documento (sin sufijo)
- * @param {(el: HTMLElement, params: Record<string, string>, rc: { root: HTMLElement, mode: 'first' | 'nav' | 'lang' }) => ViewHooks | void} [opts.setup]
+ * @param {(el: HTMLElement, params: Record<string, string>, rc: { root: HTMLElement, mode: 'first' | 'nav' | 'lang', route: string }) => ViewHooks | void} [opts.setup]
  *   animaciones/listeners dentro del contexto. Puede devolver hooks para sobrescribir enter/leave y limpiar listeners.
  *
  * @typedef {object} ViewHooks
@@ -60,7 +60,7 @@ export function makeView({ name, render, title, setup }) {
     name,
     getTitle: (params) => title?.(params) ?? '',
 
-    /** @param {{ root: HTMLElement, mode: 'first' | 'nav' | 'lang' }} rc @param {Record<string, string>} params */
+    /** @param {{ root: HTMLElement, mode: 'first' | 'nav' | 'lang', route: string }} rc @param {Record<string, string>} params */
     mount(rc, params) {
       el = document.createElement('section');
       el.className = `view view-${name}`;

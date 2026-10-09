@@ -31,7 +31,7 @@ src/router.js · scroll.js · i18n.js · motion.js
 src/data/      projects.json · timeline.json   (textos como { es, en }; `title` y `org` no se traducen)
 src/i18n/      es.json · en.json               (textos de interfaz)
 src/views/     home.js · project.js · about.js
-src/components/ header.js · cursor.js · preloader.js · hero.js · trail.js · ring.js · timeline.js
+src/components/ header.js · cursor.js · preloader.js · hero.js · trail.js · ring.js · persistent.js · timeline.js
 src/styles/    tokens.css · base.css · header.css · home.css · project.css · about.css
 ```
 
@@ -82,7 +82,26 @@ src/styles/    tokens.css · base.css · header.css · home.css · project.css �
 - **Dos condiciones independientes**: `trail.setArmed()` (la vista lo arma al terminar la entrada del hero y lo desarma en `destroy`) y `trail.setInRange()` (ScrollTrigger del hero, `TRAIL_CONFIG.activeRange`, `onLeave`/`onEnterBack`). Además: puntero fino, sin reduced-motion y solo `pointerType === 'mouse'`. `sync()` reconcilia todo con un único listener `pointermove` en `window`.
 - El estado inicial del rango se calcula con `range.progress < 1`: `ScrollTrigger.isActive` es `false` con el scroll exactamente en el inicio.
 - Spawn: distancia mínima `clamp(min, innerWidth * vw, max)`; cada imagen hace pop → hold → fade con una timeline; si hay `maxActive` activas, la más antigua se desvanece de golpe (`quickFade`). `will-change` solo mientras anima. Las imágenes se decodifican (`img.decode()`) antes de la primera activación.
-- Home tiene ahora **2 ScrollTriggers** (el maestro y el del rango del trail); al salir quedan 0.
+- Home tiene ahora **3 ScrollTriggers** (el maestro, el del rango del trail y el de inicio del anillo); al salir quedan 0.
+
+## Anillo de proyectos (fase 5)
+
+- `components/ring.js` + `RING_CONFIG` (`config.js`). **Capa persistente** `#layer-ring` (fixed, `z-index: 1`: sobre la vista y bajo trail/header), creada una sola vez en `initRing()`. No se remonta al cambiar de idioma (solo `refreshLabels()`: `aria-label` = "título — categoría").
+- **Motor**: un proxy `s = { r, rot, spread, spin }` y `place()` que reposiciona las tarjetas (`quickSetter` de `x`, `y`, `scaleX`, `scaleY`). Posiciones, flotación y profundidad salen de un PRNG con semilla (`RING_CONFIG.seed`): el anillo se ve igual en cada visita. Un solo ticker, que se detiene cuando la capa se oculta. Geometría por breakpoint en `RING_CONFIG.layout` (móvil: elipse vertical).
+- **Giro**: `idleSpin` + velocidad de Lenis (suavizada con `quickTo`, con tope) × `spin` (multiplicador que baja con hover/`pause()`). Es aditivo sobre `rot`, así que no choca con la intro (`r`, `spread`).
+- **Intro** `playIntro()` (flotan → hold → se juntan → se expanden) arranca al **cruzar `open`** (ScrollTrigger `ringStart` en `buildScroll`) y es **interrumpible por click o tecla** (`pointerdown`/`keydown` → `progress(1, false)`), NO por scroll: la ventana termina de abrirse con la rueda en movimiento y un scroll cualquiera la cancelaría casi siempre. `playIntro({ short: true })` es la versión de 0.9 s para volver de un proyecto (fase 7). `reset()` (visita nueva al home) la deja pendiente; si el usuario solo sube y baja de `open`, el anillo se oculta/muestra sin repetirla.
+- **Scroll del home** (`HOME_SCROLL`, ya completo): `open` 150 + `statement` 100 + `ring` 150 = 400vh → `hero-wrap` = 500vh, y el documento termina en `.site-footer`. El statement sale al 60 % de su zona; en los últimos 15 % de `ring` el anillo se desvanece (`autoAlpha`, para no interceptar clicks) y llega el footer.
+- **Hover** (solo ratón, y solo con la intro terminada): la tarjeta ×1.12, el resto a 0.35, `spin` a 0.15 y etiqueta `[ título ]` en el cursor (`data-cursor="label"`). El foco por teclado hace lo mismo. En reduced-motion solo atenúa (sin escala).
+- **`/projects`** (alias de home): evento `route:alias` → el hero lleva el scroll a `open + 0.35·statement` (`goRing`); en carga directa lo hace tras la intro. En reduced-motion abre la ventana con el botón.
+- **Provisional (fase 6):** el click en una tarjeta navega directo a `/projects/<slug>` y al salir del home el anillo se oculta (`leave` del hero). La fase 6 lo cambia por enfocar → Flip, y mantiene el anillo vivo bajo el proyecto.
+- `window.__app = { lenis, navigate, ScrollTrigger, ring }` y `window.__replayRing()` solo en DEV.
+
+### Trampas de GSAP encontradas (aplican a cualquier componente persistente)
+
+- **Los callbacks de un ScrollTrigger creado dentro de un `gsap.context()` corren dentro de ese contexto**: los tweens que creen se registran en él y `ctx.revert()` (al desmontar la vista) los **deshace**. Para anillo y trail (que sobreviven a las vistas) toda API pública pasa por `detached()` (`components/persistent.js`). Si añades otra capa persistente, haz lo mismo.
+- **`gsap.quickSetter(el, 'scale')` no escribe nada en GSAP 3.15** (su setter está pensado para tweens). Usa `scaleX` y `scaleY`.
+- Una función que devuelve una animación de GSAP es *thenable*: `await` espera a que termine (afecta a `page.evaluate`). Los helpers de dev no devuelven la timeline.
+- `ScrollTrigger.isActive` es `false` con el scroll exactamente en el inicio; para "dentro del rango" usa `progress < 1`.
 
 ## Decisiones de arquitectura (complementan el brief)
 

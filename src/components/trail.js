@@ -1,6 +1,7 @@
 import gsap from 'gsap';
 import { TRAIL_CONFIG } from '../config.js';
 import { hasFinePointer, prefersReducedMotion, onMotionChange } from '../motion.js';
+import { detached } from './persistent.js';
 
 /**
  * Trail del mouse: pool fijo de <img> reutilizados en ciclo (no se crean ni destruyen nodos en runtime).
@@ -121,15 +122,17 @@ function sync() {
   }
 }
 
+// `detached`: se llama desde callbacks de ScrollTrigger de la vista; sus tweens no deben registrarse en el contexto
+// de esa vista (ctx.revert() al desmontar los deshacería y dejaría stickers a medias). Ver components/persistent.js.
 export const trail = {
   /** La vista lo activa cuando termina la entrada del hero y lo desactiva al desmontarse. */
-  setArmed(value) {
+  setArmed: detached((value) => {
     armed = value;
     sync();
-  },
+  }),
   /** Lo gobierna el ScrollTrigger del hero. */
-  setInRange(value) {
+  setInRange: detached((value) => {
     inRange = value;
     sync();
-  }
+  })
 };

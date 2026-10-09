@@ -20,6 +20,7 @@
     "closeProjects": "back",
     "statement": "things i build"
   },
+  "ring": { "label": "Projects" },
   "cursor": { "view": "View" },
   "project": { "info": "info", "role": "role", "year": "year", "close": "close", "return": "keep scrolling → projects" },
   "about": {

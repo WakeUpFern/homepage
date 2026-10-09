@@ -23,6 +23,7 @@ import { initScroll } from './scroll.js';
 import { initCursor } from './components/cursor.js';
 import { initHeader } from './components/header.js';
 import { initTrail } from './components/trail.js';
+import { initRing, ring } from './components/ring.js';
 import { runPreloader } from './components/preloader.js';
 import { initRouter, navigate } from './router.js';
 import { PRELOAD_ASSETS, PRELOAD_FONTS } from './config.js';
@@ -31,6 +32,7 @@ initI18n();
 const lenis = initScroll();
 initCursor();
 initTrail(document.getElementById('trail'));
+initRing(document.getElementById('layer-ring'));
 initHeader(document.getElementById('header'));
 const app = document.getElementById('app');
 const decode = (src) => {
@@ -53,4 +55,4 @@ initRouter({
   ready
 });
 
-if (import.meta.env.DEV) window.__app = { lenis, navigate, ScrollTrigger };
+if (import.meta.env.DEV) window.__app = { lenis, navigate, ScrollTrigger, ring };

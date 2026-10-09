@@ -3,7 +3,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HOME_SCROLL, TRAIL_CONFIG } from '../config.js';
 import { t } from '../i18n.js';
 import { prefersReducedMotion } from '../motion.js';
-import { fadeEnter } from '../views/view-utils.js';
+import { scrollTo } from '../scroll.js';
+import { LANG_SWAP, fadeEnter, fadeLeave } from '../views/view-utils.js';
+import { ring } from './ring.js';
 import { trail } from './trail.js';
 
 const HERO_CONFIG = {
@@ -24,7 +26,13 @@ const HERO_CONFIG = {
     content: { yPercent: -12, span: 0.5 },                                  // titular + párrafo se van antes de que la ventana llene la pantalla
     crossfade: [{ at: 0.35, span: 0.15 }, { at: 0.7, span: 0.15 }],         // foto 2 y foto 3
     photoEnterScale: 1.08,
-    statement: { yPercent: 150, span: 0.45, ease: 'power3.out', spread: 0.6 } // span: fracción de `statement`; spread: fracción de ese span repartida en stagger
+    statement: {
+      yPercent: 150, span: 0.45, ease: 'power3.out', spread: 0.6, // span: fracción de `statement`; spread: fracción de ese span repartida en stagger
+      exit: { at: 0.6, span: 0.3, yPercent: -150, ease: 'power3.in', spread: 0.5 } // el statement sale antes de que el anillo gire sobre la foto limpia
+    },
+    ringFade: 0.15,        // fracción de `ring` (al final del recorrido) en que el anillo se desvanece antes del footer
+    gotoStatement: 0.35,   // /projects lleva el scroll a open + esta fracción de `statement` (el anillo arranca al cruzar `open`)
+    gotoDuration: 1.8
   },
   reduced: { duration: 0.4 } // abrir/cerrar la ventana con el botón
 };
@@ -43,7 +51,7 @@ const FULL_INSET = 'inset(0px 0px 0px 0px round 0px)';
  * @param {{ mode: 'first' | 'nav' | 'lang' }} rc
  * @returns {import('../views/view-utils.js').ViewHooks}
  */
-export function createHero(el, { mode }) {
+export function createHero(el, { mode, route }) {
   const $ = (sel) => el.querySelector(sel);
   const wrap = $('.hero-wrap');
   const stage = $('.hero-stage');
@@ -67,6 +75,7 @@ export function createHero(el, { mode }) {
   const reduced = prefersReducedMotion();
   let scrollCtx = null; // contexto del ScrollTrigger (se crea al terminar la entrada)
   let reducedOpen = false;
+  let reducedTl = null;
 
   /**
    * Rectángulo de la cápsula en coordenadas del stage. Se mide relativo a `.hero-content` (que cubre el
@@ -95,9 +104,9 @@ export function createHero(el, { mode }) {
     return inset(cy, r.w - cx, r.h - cy, cx);
   }
 
-  /** Alto del recorrido de scroll (open + statement), en px. 1 unidad de la línea de tiempo = 1vh del stage. */
+  /** Alto del recorrido de scroll (open + statement + ring), en px. 1 unidad de la línea de tiempo = 1vh del stage. */
   const vh = () => stage.offsetHeight / 100;
-  const runwayUnits = HOME_SCROLL.open + HOME_SCROLL.statement;
+  const runwayUnits = HOME_SCROLL.open + HOME_SCROLL.statement + HOME_SCROLL.ring;
   const setRunway = () => wrap.style.setProperty('--hero-runway', `${vh() * runwayUnits}px`);
 
   // Sin ScrollTrigger (reduced-motion o antes de terminar la entrada) la cápsula sigue al fantasma al redimensionar.
@@ -110,9 +119,25 @@ export function createHero(el, { mode }) {
   };
   window.addEventListener('resize', onResize);
 
+  /** Scroll al anillo (alias /projects). */
+  const goRing = () => scrollTo(vh() * (HOME_SCROLL.open + HOME_SCROLL.statement * HERO_CONFIG.scroll.gotoStatement), { duration: HERO_CONFIG.scroll.gotoDuration });
+  const onAlias = (e) => {
+    if (reduced) return setReducedOpen(e.detail.name === 'projects');
+    if (e.detail.name === 'projects') goRing();
+    else scrollTo(0, { duration: HERO_CONFIG.scroll.gotoDuration });
+  };
+  document.addEventListener('route:alias', onAlias);
+
+  /** Al salir del home el anillo se oculta; al cambiar solo de idioma permanece (capa persistente). */
+  const leave = (to) => {
+    if (to !== LANG_SWAP) ring.conceal();
+    return fadeLeave(el, to);
+  };
+
   const destroy = () => {
     cancelAnimationFrame(raf);
     window.removeEventListener('resize', onResize);
+    document.removeEventListener('route:alias', onAlias);
     ScrollTrigger.removeEventListener('refreshInit', setRunway);
     trail.setArmed(false);
     scrollCtx?.revert();
@@ -122,7 +147,10 @@ export function createHero(el, { mode }) {
    * Scroll: UN solo ScrollTrigger con scrub sobre `.hero-wrap` y una línea de tiempo en unidades de vh.
    *   0 → open:                la ventana crece de cápsula a pantalla completa (clip-path), la foto hace
    *                            parallax (scale 1.35 → 1), se cruzan las fotos y se va el contenido del hero.
-   *   open → open + statement: aparece el statement. (La fase 5 monta aquí el anillo.)
+   *   open → open + statement: aparece el statement y, al cruzar `open`, arranca la intro del anillo (por
+   *                            tiempo); el statement sale después.
+   *   … → total:               el anillo gira con el scroll (velocidad de Lenis) y al final se desvanece;
+   *                            el documento termina en el footer.
    * Es reversible: al subir, la ventana vuelve a ser cápsula sin saltos.
    */
   function buildScroll() {
@@ -162,8 +190,22 @@ export function createHero(el, { mode }) {
         S.open
       );
 
+      // El statement sale (reversible): el anillo gira sobre la foto limpia.
+      const ex = st.exit;
+      const exitSpan = S.statement * ex.span;
+      tl.fromTo(
+        statementWords,
+        { yPercent: 0 },
+        { yPercent: ex.yPercent, ease: ex.ease, duration: exitSpan * (1 - ex.spread), stagger: { amount: exitSpan * ex.spread }, immediateRender: false },
+        S.open + S.statement * ex.at
+      );
+
+      // Al final del recorrido el anillo se desvanece (autoAlpha: sin hit-testing cuando ya no se ve) y llega el footer.
+      const total = S.open + S.statement + S.ring;
+      const fadeSpan = S.ring * C.ringFade;
+      tl.fromTo(ring.el, { autoAlpha: 1 }, { autoAlpha: 0, duration: fadeSpan, immediateRender: false }, total - fadeSpan);
+
       // Fija la duración total de la línea de tiempo (= recorrido completo del ScrollTrigger).
-      const total = S.open + S.statement;
       tl.to({}, { duration: 0.001 }, total - 0.001);
 
       // Si se monta con el scroll ya avanzado (cambio de idioma), salta directo a ese progreso sin "alcanzarlo" con el scrub.
@@ -179,6 +221,18 @@ export function createHero(el, { mode }) {
       });
       // Estado inicial. OJO: `isActive` es false con el scroll exactamente en el inicio (progress 0), por eso se usa progress < 1.
       trail.setInRange(range.progress < 1);
+
+      // El anillo aparece al terminar de abrirse la ventana (cruzar `open`) y se oculta si se vuelve a cerrar.
+      const ringStart = ScrollTrigger.create({
+        trigger: wrap,
+        start: () => `top+=${vh() * S.open} top`,
+        onEnter: () => ring.reveal(),
+        onLeaveBack: () => ring.conceal()
+      });
+      // Estado inicial (p. ej. remonte por idioma con el scroll ya dentro de la zona del anillo)
+      if (ringStart.scroll() >= ringStart.start) ring.reveal();
+      else ring.conceal({ instant: true });
+      ring.prime();
     }, el);
   }
 
@@ -198,21 +252,31 @@ export function createHero(el, { mode }) {
       .to(content, { autoAlpha: 0 }, 0)
       .to(statement, { autoAlpha: 1 }, 0);
 
-    openBtn.addEventListener('click', () => {
-      reducedOpen = !reducedOpen;
-      tl[reducedOpen ? 'play' : 'reverse']();
-      openBtn.setAttribute('aria-expanded', String(reducedOpen));
-      openBtn.textContent = `[ ${t(reducedOpen ? 'hero.closeProjects' : 'hero.openProjects')} ]`;
-    });
+    reducedTl = tl;
+    openBtn.addEventListener('click', () => setReducedOpen(!reducedOpen));
+  }
+
+  /** Reduced-motion: abre/cierra la ventana (y muestra el anillo, estático). */
+  function setReducedOpen(open) {
+    if (!reducedTl || open === reducedOpen) return;
+    reducedOpen = open;
+    reducedTl[open ? 'play' : 'reverse']();
+    openBtn.setAttribute('aria-expanded', String(open));
+    openBtn.textContent = `[ ${t(open ? 'hero.closeProjects' : 'hero.openProjects')} ]`;
+    if (open) ring.reveal();
+    else ring.conceal();
   }
 
   gsap.set(photoWrap, { scale: HERO_CONFIG.photoScale });
   gsap.set(statementWords, { yPercent: HERO_CONFIG.scroll.statement.yPercent });
 
+  // Visita nueva al home: el anillo empieza oculto y con la intro pendiente (si solo cambia el idioma, se conserva).
+  if (mode !== 'lang') ring.reset();
+
   if (reduced) {
     setupReduced();
     el.dataset.intro = 'done';
-    return { enter: (from) => fadeEnter(el, from), destroy };
+    return { enter: (from) => fadeEnter(el, from), leave, destroy };
   }
 
   // Remonte por cambio de idioma: estado final inmediato y el scroll se reconstruye en el progreso actual.
@@ -223,7 +287,7 @@ export function createHero(el, { mode }) {
     buildScroll();
     trail.setArmed(true);
     el.dataset.intro = 'done';
-    return { enter: (from) => fadeEnter(el, from), destroy };
+    return { enter: (from) => fadeEnter(el, from), leave, destroy };
   }
 
   // Estado inicial oculto (se fija al montar, para que nada se vea mientras corre el preloader).
@@ -246,6 +310,8 @@ export function createHero(el, { mode }) {
         buildScroll();
         trail.setArmed(true);
         document.dispatchEvent(new CustomEvent('hero:intro-complete'));
+        // Entrada directa por /projects: tras la intro, lleva el scroll al anillo (cuando el router ya soltó el bloqueo).
+        if (route === 'projects') gsap.delayedCall(0.15, goRing);
       }
     });
 
@@ -257,5 +323,5 @@ export function createHero(el, { mode }) {
     return tl;
   }
 
-  return { enter, destroy };
+  return { enter, leave, destroy };
 }

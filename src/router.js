@@ -88,13 +88,13 @@ function focusHeading() {
  */
 async function swap(next, mode) {
   // Alias de la misma vista (/ ↔ /projects): no se remonta. Solo cambia la ruta activa (header, título, aria-live).
-  // La vista decidirá qué hacer con el cambio (p. ej. la fase 5 llevará el scroll al anillo en /projects).
-  if (mode === 'nav' && current && current.route.view === next.route.view && JSON.stringify(current.params) === JSON.stringify(next.params)) {
+    if (mode === 'nav' && current && current.route.view === next.route.view && JSON.stringify(current.params) === JSON.stringify(next.params)) {
     current = next;
     document.title = documentTitle(next);
     announce(next);
     listeners.forEach((cb) => cb(current));
-    if (next.route.name === 'home') scrollTo(0);
+    // La vista decide qué hacer (home: volver arriba; projects: ir al anillo).
+    document.dispatchEvent(new CustomEvent('route:alias', { detail: { name: next.route.name } }));
     return;
   }
 
@@ -108,7 +108,7 @@ async function swap(next, mode) {
     // Con lock activo hace falta `force` para mover el scroll.
     if (mode !== 'lang') scrollTo(0, { immediate: true, force: true });
 
-    next.route.view.mount({ root: dom.root, mode }, next.params);
+    next.route.view.mount({ root: dom.root, mode, route: next.route.name }, next.params);
     current = next;
     document.title = documentTitle(next);
     if (mode !== 'lang') announce(next);

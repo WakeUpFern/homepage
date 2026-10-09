@@ -20,6 +20,7 @@
     "closeProjects": "volver",
     "statement": "cosas que construyo"
   },
+  "ring": { "label": "Proyectos" },
   "cursor": { "view": "View" },
   "project": { "info": "info", "role": "rol", "year": "año", "close": "cerrar", "return": "sigue scrolleando → proyectos" },
   "about": {

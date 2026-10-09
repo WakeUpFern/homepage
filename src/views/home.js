@@ -1,4 +1,4 @@
-import { HOME_SCROLL } from '../config.js';
+import { CONTACT_EMAIL, HOME_SCROLL } from '../config.js';
 import { t } from '../i18n.js';
 import { prefersReducedMotion } from '../motion.js';
 import { createHero } from '../components/hero.js';
@@ -10,7 +10,7 @@ const PHOTOS = ['/assets/hero/hero-1.webp', '/assets/hero/hero-2.webp', '/assets
 const SCRIBBLE_PATH =
   'M10 150 C70 110 150 50 250 12 C200 60 130 120 60 196 C150 140 260 70 360 24 C310 80 240 140 190 204 C260 160 340 100 412 60';
 
-// FASE 3: la ventana se abre con el scroll (components/hero.js). El trail (4) y el anillo (5) llegan después.
+// Hero (fases 2-3), trail (4) y anillo (5): components/hero.js, trail.js y ring.js. El footer cierra el documento.
 const words = (text) =>
   text
     .split(' ')
@@ -23,7 +23,7 @@ export default makeView({
   // El recorrido de scroll va en el HTML desde el montaje: si el documento fuera más corto aunque sea un instante
   // (p. ej. al remontar por cambio de idioma), el navegador recortaría el scroll a 0 y se perdería la posición.
   render: () => `
-    <div class="hero-wrap"${prefersReducedMotion() ? '' : ` style="--hero-runway: calc(${HOME_SCROLL.open + HOME_SCROLL.statement} * 1svh)"`}>
+    <div class="hero-wrap"${prefersReducedMotion() ? '' : ` style="--hero-runway: calc(${HOME_SCROLL.open + HOME_SCROLL.statement + HOME_SCROLL.ring} * 1svh)"`}>
       <div class="hero-stage">
         <div class="window-layer">
           <div class="window-photos">
@@ -61,6 +61,11 @@ export default makeView({
           <button class="hero-open mono" type="button" aria-expanded="false">[ ${t('hero.openProjects')} ]</button>
         </div>
       </div>
-    </div>`,
+    </div>
+    <footer class="site-footer">
+      <p class="mono">[ ${t('footer.contact')} ]</p>
+      <a class="site-footer__mail" href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a>
+      <p class="mono site-footer__copy">${t('footer.copyright')}</p>
+    </footer>`,
   setup: (el, params, rc) => createHero(el, rc)
 });

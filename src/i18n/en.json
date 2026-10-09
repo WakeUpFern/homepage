@@ -1,0 +1,33 @@
+{
+  "meta": { "title": "wakeupfern", "lang": "en" },
+  "a11y": {
+    "skip": "skip to content",
+    "viewHome": "home",
+    "viewProjects": "projects",
+    "viewAbout": "about me",
+    "viewProject": "project"
+  },
+  "nav": { "home": "home", "projects": "projects", "about": "about", "contact": "contact", "lang": "language" },
+  "header": { "projectInfo": "project info", "projectsButton": "projects" },
+  "preloader": { "skip": "skip" },
+  "hero": {
+    "line1": "hey",
+    "line2": "i'm wakeupfern",
+    "scribbleWord": "hey",
+    "about": "Developer focused on security and cloud. I build tools, backends and infrastructure that work and look good.",
+    "scroll": "scroll",
+    "openProjects": "view projects",
+    "statement": "things i build"
+  },
+  "cursor": { "view": "View" },
+  "project": { "info": "info", "role": "role", "year": "year", "close": "close", "return": "keep scrolling → projects" },
+  "about": {
+    "label": "about",
+    "intro": "engineering, security and things that look good",
+    "text": "Telematics engineer. I work across development, security and cloud.",
+    "log": "log",
+    "current": "current",
+    "goodbye": "thanks for making it this far."
+  },
+  "footer": { "copyright": "© 2026 wakeupfern", "contact": "contact" }
+}

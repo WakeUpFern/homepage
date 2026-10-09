@@ -1,0 +1,33 @@
+/* Dirección visual: limpio, blanco y negro, un solo acento. Editable aquí. */
+:root {
+  --bg: #ffffff;           /* TODO(yo) */
+  --ink: #0e0e0e;
+  --ink-soft: #6a6a66;
+  --rule: #dcdcd8;
+  --accent: #00e676;       /* único acento; TODO(yo) */
+  --accent-ink: #00351a;
+
+  --font-display: "Archivo Variable", system-ui, sans-serif;
+  --font-text: "Inter Tight Variable", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --fs-hero: clamp(3rem, 6.2vw, 7rem);     /* titular del hero */
+  --fs-title: clamp(2.2rem, 5vw, 5rem);    /* títulos de proyecto */
+  --fs-body: clamp(0.95rem, 1.05vw, 1.05rem);
+  --fs-mono: 0.6875rem;                    /* 11px, labels */
+  --fs-nav: clamp(1.25rem, 1.9vw, 1.9rem); /* header condensado */
+
+  --ls-display: -0.08em;
+  --lh-display: 0.78;
+  --stretch-nav: 72%;                      /* eje wdth de Archivo para el header */
+
+  --gutter: clamp(12px, 2vw, 28px);
+  --gap-media: 8px;
+  --header-h: 56px;
+  --header-ink: var(--ink);                /* el header lo cambia con scroll */
+
+  --radius-btn: 6px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+}

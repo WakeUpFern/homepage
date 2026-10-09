@@ -1,0 +1,33 @@
+{
+  "meta": { "title": "wakeupfern", "lang": "es" },
+  "a11y": {
+    "skip": "ir al contenido",
+    "viewHome": "inicio",
+    "viewProjects": "proyectos",
+    "viewAbout": "sobre mí",
+    "viewProject": "proyecto"
+  },
+  "nav": { "home": "home", "projects": "projects", "about": "about", "contact": "contact", "lang": "idioma" },
+  "header": { "projectInfo": "project info", "projectsButton": "proyectos" },
+  "preloader": { "skip": "saltar" },
+  "hero": {
+    "line1": "hey",
+    "line2": "soy wakeupfern",
+    "scribbleWord": "hey",
+    "about": "Desarrollador enfocado en seguridad y cloud. Construyo herramientas, backends e infraestructura que funcionan y se ven bien.",
+    "scroll": "scroll",
+    "openProjects": "ver proyectos",
+    "statement": "cosas que construyo"
+  },
+  "cursor": { "view": "View" },
+  "project": { "info": "info", "role": "rol", "year": "año", "close": "cerrar", "return": "sigue scrolleando → proyectos" },
+  "about": {
+    "label": "about",
+    "intro": "ingeniería, seguridad y cosas que se ven bien",
+    "text": "Ingeniero en Telemática. Trabajo entre desarrollo, seguridad y cloud.",
+    "log": "log",
+    "current": "actual",
+    "goodbye": "gracias por llegar hasta aquí."
+  },
+  "footer": { "copyright": "© 2026 wakeupfern", "contact": "contacto" }
+}

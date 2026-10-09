@@ -1,0 +1,402 @@
+[
+  {
+    "slug": "proyecto-uno",
+    "title": "proyecto uno",
+    "category": {
+      "es": "Web / Seguridad",
+      "en": "Web / Security"
+    },
+    "year": 2026,
+    "role": {
+      "es": "Desarrollo",
+      "en": "Development"
+    },
+    "cover": "/assets/projects/proyecto-uno/cover.webp",
+    "coverRatio": 0.75,
+    "info": {
+      "es": "Texto corto para el panel Project Info. Reemplazar con la descripción real del proyecto.",
+      "en": "Short text for the Project Info panel. Replace with the real project description."
+    },
+    "blocks": [
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-uno/01.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-uno/02.webp",
+          "/assets/projects/proyecto-uno/03.webp"
+        ]
+      },
+      {
+        "type": "text",
+        "text": {
+          "es": "Párrafo corto.",
+          "en": "Short paragraph."
+        }
+      },
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-uno/04.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-uno/05.webp",
+          "/assets/projects/proyecto-uno/06.webp"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "proyecto-dos",
+    "title": "proyecto dos",
+    "category": {
+      "es": "Cloud / Infraestructura",
+      "en": "Cloud / Infrastructure"
+    },
+    "year": 2025,
+    "role": {
+      "es": "Infraestructura",
+      "en": "Infrastructure"
+    },
+    "cover": "/assets/projects/proyecto-dos/cover.webp",
+    "coverRatio": 0.8,
+    "info": {
+      "es": "Texto corto para el panel Project Info. Reemplazar con la descripción real del proyecto.",
+      "en": "Short text for the Project Info panel. Replace with the real project description."
+    },
+    "blocks": [
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-dos/01.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-dos/02.webp",
+          "/assets/projects/proyecto-dos/03.webp"
+        ]
+      },
+      {
+        "type": "text",
+        "text": {
+          "es": "Párrafo corto.",
+          "en": "Short paragraph."
+        }
+      },
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-dos/04.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-dos/05.webp",
+          "/assets/projects/proyecto-dos/06.webp"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "proyecto-tres",
+    "title": "proyecto tres",
+    "category": {
+      "es": "Backend",
+      "en": "Backend"
+    },
+    "year": 2024,
+    "role": {
+      "es": "Backend",
+      "en": "Backend"
+    },
+    "cover": "/assets/projects/proyecto-tres/cover.webp",
+    "coverRatio": 1,
+    "info": {
+      "es": "Texto corto para el panel Project Info. Reemplazar con la descripción real del proyecto.",
+      "en": "Short text for the Project Info panel. Replace with the real project description."
+    },
+    "blocks": [
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-tres/01.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-tres/02.webp",
+          "/assets/projects/proyecto-tres/03.webp"
+        ]
+      },
+      {
+        "type": "text",
+        "text": {
+          "es": "Párrafo corto.",
+          "en": "Short paragraph."
+        }
+      },
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-tres/04.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-tres/05.webp",
+          "/assets/projects/proyecto-tres/06.webp"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "proyecto-cuatro",
+    "title": "proyecto cuatro",
+    "category": {
+      "es": "Herramientas internas",
+      "en": "Internal tools"
+    },
+    "year": 2026,
+    "role": {
+      "es": "Desarrollo",
+      "en": "Development"
+    },
+    "cover": "/assets/projects/proyecto-cuatro/cover.webp",
+    "coverRatio": 1.25,
+    "info": {
+      "es": "Texto corto para el panel Project Info. Reemplazar con la descripción real del proyecto.",
+      "en": "Short text for the Project Info panel. Replace with the real project description."
+    },
+    "blocks": [
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-cuatro/01.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-cuatro/02.webp",
+          "/assets/projects/proyecto-cuatro/03.webp"
+        ]
+      },
+      {
+        "type": "text",
+        "text": {
+          "es": "Párrafo corto.",
+          "en": "Short paragraph."
+        }
+      },
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-cuatro/04.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-cuatro/05.webp",
+          "/assets/projects/proyecto-cuatro/06.webp"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "proyecto-cinco",
+    "title": "proyecto cinco",
+    "category": {
+      "es": "Web / Diseño",
+      "en": "Web / Design"
+    },
+    "year": 2025,
+    "role": {
+      "es": "Desarrollo",
+      "en": "Development"
+    },
+    "cover": "/assets/projects/proyecto-cinco/cover.webp",
+    "coverRatio": 0.75,
+    "info": {
+      "es": "Texto corto para el panel Project Info. Reemplazar con la descripción real del proyecto.",
+      "en": "Short text for the Project Info panel. Replace with the real project description."
+    },
+    "blocks": [
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-cinco/01.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-cinco/02.webp",
+          "/assets/projects/proyecto-cinco/03.webp"
+        ]
+      },
+      {
+        "type": "text",
+        "text": {
+          "es": "Párrafo corto.",
+          "en": "Short paragraph."
+        }
+      },
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-cinco/04.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-cinco/05.webp",
+          "/assets/projects/proyecto-cinco/06.webp"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "proyecto-seis",
+    "title": "proyecto seis",
+    "category": {
+      "es": "Seguridad",
+      "en": "Security"
+    },
+    "year": 2024,
+    "role": {
+      "es": "Infraestructura",
+      "en": "Infrastructure"
+    },
+    "cover": "/assets/projects/proyecto-seis/cover.webp",
+    "coverRatio": 1,
+    "info": {
+      "es": "Texto corto para el panel Project Info. Reemplazar con la descripción real del proyecto.",
+      "en": "Short text for the Project Info panel. Replace with the real project description."
+    },
+    "blocks": [
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-seis/01.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-seis/02.webp",
+          "/assets/projects/proyecto-seis/03.webp"
+        ]
+      },
+      {
+        "type": "text",
+        "text": {
+          "es": "Párrafo corto.",
+          "en": "Short paragraph."
+        }
+      },
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-seis/04.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-seis/05.webp",
+          "/assets/projects/proyecto-seis/06.webp"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "proyecto-siete",
+    "title": "proyecto siete",
+    "category": {
+      "es": "Cloud",
+      "en": "Cloud"
+    },
+    "year": 2026,
+    "role": {
+      "es": "Backend",
+      "en": "Backend"
+    },
+    "cover": "/assets/projects/proyecto-siete/cover.webp",
+    "coverRatio": 0.8,
+    "info": {
+      "es": "Texto corto para el panel Project Info. Reemplazar con la descripción real del proyecto.",
+      "en": "Short text for the Project Info panel. Replace with the real project description."
+    },
+    "blocks": [
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-siete/01.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-siete/02.webp",
+          "/assets/projects/proyecto-siete/03.webp"
+        ]
+      },
+      {
+        "type": "text",
+        "text": {
+          "es": "Párrafo corto.",
+          "en": "Short paragraph."
+        }
+      },
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-siete/04.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-siete/05.webp",
+          "/assets/projects/proyecto-siete/06.webp"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "proyecto-ocho",
+    "title": "proyecto ocho",
+    "category": {
+      "es": "Investigación",
+      "en": "Research"
+    },
+    "year": 2025,
+    "role": {
+      "es": "Desarrollo",
+      "en": "Development"
+    },
+    "cover": "/assets/projects/proyecto-ocho/cover.webp",
+    "coverRatio": 1.25,
+    "info": {
+      "es": "Texto corto para el panel Project Info. Reemplazar con la descripción real del proyecto.",
+      "en": "Short text for the Project Info panel. Replace with the real project description."
+    },
+    "blocks": [
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-ocho/01.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-ocho/02.webp",
+          "/assets/projects/proyecto-ocho/03.webp"
+        ]
+      },
+      {
+        "type": "text",
+        "text": {
+          "es": "Párrafo corto.",
+          "en": "Short paragraph."
+        }
+      },
+      {
+        "type": "full",
+        "src": "/assets/projects/proyecto-ocho/04.webp"
+      },
+      {
+        "type": "pair",
+        "src": [
+          "/assets/projects/proyecto-ocho/05.webp",
+          "/assets/projects/proyecto-ocho/06.webp"
+        ]
+      }
+    ]
+  }
+]

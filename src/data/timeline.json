@@ -1,0 +1,50 @@
+[
+  {
+    "year": 2026,
+    "code": "MX",
+    "current": true,
+    "org": "UPIITA-IPN",
+    "role": {
+      "es": "Proyecto Terminal",
+      "en": "Capstone project"
+    },
+    "text": {
+      "es": "Cierre de Ingeniería en Telemática (graduación prevista dic 2026).",
+      "en": "Final stretch of the Telematics Engineering degree (graduation expected Dec 2026)."
+    },
+    "logos": [],
+    "cases": []
+  },
+  {
+    "year": 2024,
+    "code": "MX",
+    "current": false,
+    "org": "RyR",
+    "role": {
+      "es": "Developer",
+      "en": "Developer"
+    },
+    "text": {
+      "es": "Consultoría de seguridad. Desarrollo y herramientas internas.",
+      "en": "Security consulting. Development and internal tooling."
+    },
+    "logos": [],
+    "cases": []
+  },
+  {
+    "year": 2023,
+    "code": "MX",
+    "current": false,
+    "org": "Mácara Café",
+    "role": {
+      "es": "Backend / Infra (freelance)",
+      "en": "Backend / Infra (freelance)"
+    },
+    "text": {
+      "es": "Backend e infraestructura para un negocio local.",
+      "en": "Backend and infrastructure for a local business."
+    },
+    "logos": [],
+    "cases": []
+  }
+]
